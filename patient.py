@@ -32,24 +32,30 @@ def show_patient():
         for x, name in enumerate(patient_names):
             print(f"{x+1}: {name}")
 
-def start_program():
-    isRunning = True
-    while isRunning:
-        print("1. Add patient")
-        print("2. remove patient")
-        print("3. edit patient")
-        print("4. Show patient")
-        choice = int(input("Enter number: "))
+def show_menu():
+   
+    print("1. Add patient")
+    print("2. remove patient")
+    print("3. edit patient")
+    print("4. Show patient")
+    print("5. Exit")
 
-        if choice < 1 or choice > 4:
-            print("invalid choice")
-        elif choice == 1:
+    choice = int(input("Enter number: "))
+
+    match choice:
+        case 1:
             add_patient(choice)
-        elif choice == 2:
+        case 2:
             remove_patient(choice)
-        elif choice == 3:
+        case 3:
             edit_patient(choice)
-        elif choice == 4:
+        case 4:
             show_patient()
+        case 5:
+            print("Exiting...")
+            exit()
+        case _:
+            print("Invalid choice")
 
-start_program()
+if __name__ == "__main__":
+    show_menu()
