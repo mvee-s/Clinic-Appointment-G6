@@ -1,10 +1,13 @@
-doctors_names = []
+doctors = []
 
-def add_doctor(doctors_name):
-    doctors_names.append(doctors_name)
+def add_doctor(name):
+    doctors.append(name) 
 
-    for doctor in doctors_names:
-        print(f"Doctor: {doctor}")
+add_doctor(input("Enter new Doctor name: "))
 
-new_doctor = add_doctor(input("Enter new doctor name: "))
+print("\nDoctors: ")
+for doctor in doctors:
+    print(f"Doctor {doctor}")
+
+
 
