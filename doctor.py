@@ -1,8 +1,98 @@
 doctors = []
 
+def get_valid_name(message):
+    while True:
+        name = input(message).strip()
+
+        if name == "":
+            print("Input cannot be empty.")
+
+        elif not name.replace(" ", "").isalpha():
+            print("Kindly enter letters only.")
+
+        else:
+            return name
+
+def get_valid_specialization():
+    while True:
+        specialization = input("Enter Specialization: ").strip()
+
+        if specialization == "":
+            print("Specialization cannot be empty.")
+        
+        else:
+            return specialization
+
+def get_valid_day():
+    days = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+    ]
+
+    while True:
+        day = input("Enter (Monday - Sunday): ").strip().capitalize()
+
+        if day in days:
+            return day
+        
+        print("Invalid day. Please enter Monday - Sunday only.")
+
+def get_valid_time(message):
+    while True:
+        time = input(message).strip()
+
+        try:
+            from datetime import datetime
+
+            datetime.strptime(time, "%I:%M %p")
+            return time.upper()
+
+        except ValueError:
+            print("\nInvalid Time. Follow 12-hour time format: (e.g. 9:00 AM)")
+
+def get_valid_time_range():
+    while True:
+        start_time = get_valid_time("\nFollow 12-hour time format. \nEnter start time (e.g. 9:00 AM): ")
+
+        end_time = get_valid_time("Enter end time (e.g. 5:00 PM): ")
+
+        from datetime import datetime
+
+        start = datetime.strptime(start_time, "%I:%M %p")
+        end = datetime.strptime(end_time, "%I:%M %p")
+
+        if end > start:
+            return start_time, end_time
+
+        print("\nEnd time must be later than start time.")
+def get_valid_number(message, minimum, maximum):
+    while True:
+        try:
+            choice = int(input(message))
+
+            if minimum <= choice <= maximum:
+                return choice
+
+            print("\nInvalid choice.")
+
+        except ValueError:
+            print("\nKindly enter a number.")
+            
+def schedule_exists(doctor, day, start_time, end_time):
+    for schedule in doctor["schedule"]:
+
+        if schedule["day"] == day and schedule["start_time"] == start_time and schedule["end_time"] == end_time:
+            return True
+    return False
+
 def add_doctor():
-    name = input("Enter new Doctor name: ")
-    specialization = input("Enter Specialization: ")
+    name = get_valid_name("Enter new Doctor name: ")
+    specialization = get_valid_specialization()
 
     doctor = {
         "name" : name,
@@ -10,23 +100,29 @@ def add_doctor():
         "schedule" : []
     }
 
-    print("ADD DOCTOR SCHEDULE")
+    print("\n==========ADD DOCTOR SCHEDULE==========")
     
     while True:
-        day = input("Enter day: ")
-        time = input("Enter time: ")
+        day = get_valid_day()
+
+        start_time, end_time = get_valid_time_range()
+
+        if schedule_exists(doctor, day, start_time, end_time):
+            print("\n Schedule already exists.")
+            continue
 
         schedule = {
             "day": day,
-            "time": time,
+            "start_time": start_time,
+            "end_time": end_time,     
             "available": True
         }
         
         doctor["schedule"].append(schedule)
 
-        print("Schedule added successfully")
+        print("\nSchedule added successfully")
 
-        another = input("Do you want another schedule? (Y/N): ")
+        another = input("\nDo you want another schedule? (Y/N): ")
 
         if another.upper() != "Y":
             break
@@ -35,10 +131,13 @@ def add_doctor():
 
 def view_doctors():
     if len(doctors) == 0:
+        print("===========")
         print("No doctors found.")
+        print("==========")
         return
 
     for i, doctor in enumerate(doctors, start=1):
+        print("\n==========LIST OF DOCTORS==========")
         print(f"{i}. Dr. {doctor['name']}")
         print(f"Specialization: {doctor['specialization']}")
 
@@ -54,7 +153,7 @@ def view_doctors():
                     else "Booked"
                 )
 
-                print(f" - {schedule['day']} | {schedule['time']} | {status}")
+                print(f" - {schedule['day']} | {schedule['start_time']} - {schedule['end_time']} | {status}")
                 
 
 def delete_doctor():
@@ -63,14 +162,11 @@ def delete_doctor():
     if len(doctors) == 0:
         return
 
-    choice = int(input("[Enter doctor number to delete: ]"))
+    choice = get_valid_number("Enter Doctor number to delete: ", 1, len(doctors))
 
-    if 1 <= choice <= len(doctors):
-        deleted = doctors.pop(choice - 1)
-        print(f"\n{deleted['name']} has been deleted.")
-
-    else:
-        print("\nInvalid Choice.")
+    deleted = doctors.pop(choice - 1)
+    
+    print(f"\n{deleted['name']} has been deleted.")
 
 def edit_doctor():
     view_doctors()
@@ -78,169 +174,125 @@ def edit_doctor():
     if len(doctors) == 0:
         return
 
-    choice = int(input("Select doctor number to edit: "))
+    choice = get_valid_number("Enter Doctor number to edit: ", 1, len(doctors))
 
-    if 1 <= choice <= len(doctors):
-        doctor = doctors[choice - 1]
+    doctor = doctors[choice - 1]
 
-        while True:
-            print("[1. Edit Name]")
-            print("[2. Edit Specialization]")
-            print("[3. Edit Schedule]")
-            print("[4. Back]")
+    while True:
+        print("[1. Edit Name]")
+        print("[2. Edit Specialization]")
+        print("[3. Edit Schedule]")
+        print("[4. Add Schedule]")
+        print("[5. Back]")
 
-            edit_choice = input("What do you want to edit? ")
+        edit_choice = get_valid_number("What do you want to edit? ", 1, 5)
 
-            if edit_choice == "1":
-                new_name = input("Enter updated name: ")
+        if edit_choice == 1:
+            new_name = get_valid_name("Enter updated name: ")
 
-                if new_name != "":
-                    doctor["name"] = new_name
-                    print("Doctor name updated successfully.")
-                else:
-                    print("Name cannot be empty.")
+            doctor["name"] = new_name
+            
+            print("Doctor name updated successfully.")
+            
 
-            elif edit_choice == "2":
-                new_specialization = input("Enter updated Specialization: ")
+        elif edit_choice == 2:
+            new_specialization = get_valid_specialization()
+            
+            doctor["specialization"] = new_specialization
 
-                if new_specialization != "":
-                        doctor["specialization"] = new_specialization
-                        print("\nSpecialization updated successfully.")
-                else:
-                    print("\nSpecialization cannot be empty.")
+            print("\nSpecialization updated successfully.")
+            
 
-            elif edit_choice == "3":
-                if len(doctor["schedule"]) == 0:
-                    print("\nNo schedule found for this doctor.")
+        elif edit_choice == 3:
+            if len(doctor["schedule"]) == 0:
+                print("\nNo schedule found for this doctor.")
+            
+            else:
+                print(f"\n===== SCHEDULE OF DR. {doctor['name'].upper()} =====")
                 
-                else:
-                    print(f"\n===== SCHEDULE OF DR. {doctor['name'].upper()} =====")
+
+                for i, schedule in enumerate(doctor["schedule"], start=1):
+                    status = "Available" if schedule["available"] else "Booked"
+
+                    print(f"{i}. {schedule['day']} - {schedule['time']} - {status}")
+
+                schedule_choice = get_valid_number("\nEnter schedule number to edit: ", 1, len(doctor["schedule"]))
+
+                
+                schedule = doctor["schedule"][schedule_choice - 1]
+
+                print("\nWhat do you want to edit?")
+                print("[1. Day]")
+                print("[2. Time]")
+                print("[3. Availability]")
+
+                schedule_edit = get_valid_number("\nEnter choice: ", 1, 3)
+
+                if schedule_edit == 1:
+                    new_day = get_valid_day()
+                    
+                    schedule["day"] = new_day
+                    print("\nDay updated successfully.")
                     
 
-                    for i, schedule in enumerate(doctor["schedule"], start=1):
-                        status = "Available" if schedule["available"] else "Booked"
+                elif schedule_edit == 2:
+                    new_time = get_valid_time()
 
-                        print(
-                            f"{i}. {schedule['day']} - "
-                            f"{schedule['time']} - {status}"
-                        )
+                
+                    schedule["time"] = new_time
+                    print("\nTime updated successfully.")
+                    
 
-                    schedule_choice = int(
-                        input("\nEnter schedule number to edit: ")
-                    )
+                elif schedule_edit == 3:
+                    print("\n[1. Available]")
+                    print("[2. Booked]")
 
-                    if 1 <= schedule_choice <= len(doctor["schedule"]):
-                        schedule = doctor["schedule"][schedule_choice - 1]
+                    availability = get_valid_number("Enter availability: ", 1, 2)
 
-                        print("\nWhat do you want to edit?")
-                        print("[1. Day]")
-                        print("[2. Time]")
-                        print("[3. Availability]")
+                    if availability == 1:
+                        schedule["available"] = True
+                        print("\nSchedule is now Available.")
 
-                        schedule_edit = input("\nEnter choice: ")
+                    elif availability == 2:
+                        schedule["available"] = False
+                        print("\nSchedule is now Booked.")
 
-                        if schedule_edit == "1":
-                            new_day = input("Enter new day: ")
+        elif edit_choice == 4:
+            day = get_valid_day()
+            time = get_valid_time()
 
-                            if new_day != "":
-                                schedule["day"] = new_day
-                                print("\nDay updated successfully.")
-                            else:
-                                print("\nDay cannot be empty.")
+            if schedule_exists(doctor, day, time):
+                print("\nSchedule already exists.")
+                continue
+            schedule = {
+                "day": day,
+                "time": time,
+                "available": True
+            }
 
-                        elif schedule_edit == "2":
-                            new_time = input("Enter new time: ")
+            doctor["schedule"].append(schedule)
 
-                            if new_time != "":
-                                schedule["time"] = new_time
-                                print("\nTime updated successfully.")
-                            else:
-                                print("\nTime cannot be empty.")
+            print(f"\nSchedule added successfully for Dr. {doctor['name']}.")
 
-                        elif schedule_edit == "3":
-                            print("\n[1. Available]")
-                            print("[2. Booked]")
 
-                            availability = input(
-                                "Enter availability: "
-                            )
+        elif edit_choice == 5:
+            break
 
-                            if availability == "1":
-                                schedule["available"] = True
-                                print("\nSchedule is now Available.")
+        else:
+            print("\nInvalid choice.")
 
-                            elif availability == "2":
-                                schedule["available"] = False
-                                print("\nSchedule is now Booked.")
+    
 
-                            else:
-                                print("\nInvalid choice.")
-
-                        else:
-                            print("\nInvalid choice.")
-
-                    else:
-                        print("\nInvalid schedule choice.")
-
-            elif edit_choice == "4":
-                break
-
-            else:
-                print("\nInvalid choice.")
-
-    else:
-        print("\nInvalid doctor choice.")
-
-def add_schedule():
-    view_doctors()
-
-    if len(doctors) == 0:
-        return
-
-    choice = int(
-        input("Enter doctor number to add schedule: ")
-    )
-
-    if 1 <= choice <= len(doctors):
-
-        doctor = doctors[choice - 1]
-
-        day = input(
-            "Enter day (e.g. Monday): "
-        )
-
-        time = input(
-            "Enter time (e.g. 9:00 AM): "
-        )
-
-        schedule = {
-            "day": day,
-            "time": time,
-            "available": True
-        }
-
-        doctor["schedule"].append(schedule)
-
-        print(
-            f"\nSchedule added successfully for "
-            f"Dr. {doctor['name']}."
-        )
-
-    else:
-        print("\nInvalid Choice.")
 
 def menu_doctor():
 
     while True:
-        print("\n==========LIST OF DOCTORS==========")
-        view_doctors()
-
         print("\n==========DOCTOR MENU==========")
         print("[1. View Doctors]")
-        print("[2. Add Doctors]")
-        print("[3. Edit Doctors]")
-        print("[4. Delete Doctors]")
-        print("[5. Exit]")
+        print("[2. Add Doctor]")
+        print("[3. Edit Doctor]")
+        print("[4. Delete Doctor]")
+        print("[5. End]")
 
         choice = input("\nEnter choice: ")
 
@@ -257,8 +309,7 @@ def menu_doctor():
             delete_doctor()
 
         elif choice == "5":
-            print("======================")
-            print("List of Doctors")
+            print("==========LIST OF DOCTORS==========")
             break
 
         else:
@@ -266,12 +317,6 @@ def menu_doctor():
 
 menu_doctor()
 
-
-print("\nDoctors: ")
-
-for doctor in doctors:
-    print(f"Doctor {doctor['name']}")
-    print(f"Specialization: {doctor['specialization']}")
 
 
 
