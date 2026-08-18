@@ -230,7 +230,12 @@ def add_schedule():
         print("\nInvalid Choice.")
 
 def menu_doctor():
+
     while True:
+        print("\n==========LIST OF DOCTORS==========")
+        view_doctors()
+
+        print("\n==========DOCTOR MENU==========")
         print("[1. View Doctors]")
         print("[2. Add Doctors]")
         print("[3. Edit Doctors]")
