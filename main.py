@@ -1,6 +1,13 @@
-import patient 
-import doctor
+from patient import patient_menu
+from doctor import doctor_menu
 
+def summary():
+    print("\nClinic Management Summary:")
+    print("==========================")
+    print("1. View Patient")
+    print("2. View Doctor")
+    print("3. View Schedule")  
+    
 isRunning = True
 while isRunning:
     
@@ -14,13 +21,15 @@ while isRunning:
     
     try:
         choice = int(input("Enter number: "))
-
+    
         match choice:
             case 1:
-                patient.patient_menu()
+                patient_menu()
             case 2:
-                doctor.doctor_menu()
-            case 3:
+                doctor_menu()
+            case 3: 
+                summary()
+            case 4:
                 isRunning = False
                 print("Exiting...")
             case _:
