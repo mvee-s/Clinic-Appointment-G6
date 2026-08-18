@@ -131,9 +131,7 @@ def add_doctor():
 
 def view_doctors():
     if len(doctors) == 0:
-        print("===========")
-        print("No doctors found.")
-        print("==========")
+        print("==========NO DOCTORS FOUND==========")
         return
 
     for i, doctor in enumerate(doctors, start=1):
@@ -214,7 +212,7 @@ def edit_doctor():
                 for i, schedule in enumerate(doctor["schedule"], start=1):
                     status = "Available" if schedule["available"] else "Booked"
 
-                    print(f"{i}. {schedule['day']} - {schedule['time']} - {status}")
+                    print(f"{i}. {schedule['day']} - {schedule['start_time']} - {schedule['end_time']} {status}")
 
                 schedule_choice = get_valid_number("\nEnter schedule number to edit: ", 1, len(doctor["schedule"]))
 
@@ -223,10 +221,11 @@ def edit_doctor():
 
                 print("\nWhat do you want to edit?")
                 print("[1. Day]")
-                print("[2. Time]")
-                print("[3. Availability]")
+                print("[2. Start Time]")
+                print("[3. End Time]")
+                print("[4. Availability]")
 
-                schedule_edit = get_valid_number("\nEnter choice: ", 1, 3)
+                schedule_edit = get_valid_number("\nEnter choice: ", 1, 4)
 
                 if schedule_edit == 1:
                     new_day = get_valid_day()
@@ -236,14 +235,19 @@ def edit_doctor():
                     
 
                 elif schedule_edit == 2:
-                    new_time = get_valid_time()
-
+                    new_start_time = get_valid_time("\nFollow 12-hour time format. \nEnter new start time (e.g. 9:00 AM)")
                 
-                    schedule["time"] = new_time
-                    print("\nTime updated successfully.")
+                    schedule["start_time"] = new_start_time
+                    print("\nStart Time updated successfully.")
+                
+                elif schedule_edit == 3:
+                    new_end_time = get_valid_time("\nFollow 12-hour time format. \nEnter new end time (e.g. 5:00 PM)")
+                
+                    schedule["end_time"] = new_end_time
+                    print("\nEnd Time updated successfully.")
                     
 
-                elif schedule_edit == 3:
+                elif schedule_edit == 4:
                     print("\n[1. Available]")
                     print("[2. Booked]")
 
@@ -259,14 +263,17 @@ def edit_doctor():
 
         elif edit_choice == 4:
             day = get_valid_day()
-            time = get_valid_time()
 
-            if schedule_exists(doctor, day, time):
+            start_time, end_time = get_valid_time_range()
+            
+
+            if schedule_exists(doctor, day, start_time, end_time):
                 print("\nSchedule already exists.")
                 continue
             schedule = {
                 "day": day,
-                "time": time,
+                "start_time": start_time,
+                "end_time": end_time,
                 "available": True
             }
 
@@ -309,7 +316,10 @@ def menu_doctor():
             delete_doctor()
 
         elif choice == "5":
-            print("==========LIST OF DOCTORS==========")
+            for i, doctor in enumerate(doctors, start=1):
+                print("==========LIST OF DOCTORS==========")
+                print(f"{i}. Dr. {doctor['name']}")
+
             break
 
         else:
