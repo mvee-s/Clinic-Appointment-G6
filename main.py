@@ -17,7 +17,8 @@ while isRunning:
     
     print("1. Patient Management")
     print("2. Doctor Management")
-    print("3. Exit")
+    print("3. Schedule Management")
+    print("4. Exit")
     
     try:
         choice = int(input("Enter number: "))
