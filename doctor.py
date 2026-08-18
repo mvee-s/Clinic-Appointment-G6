@@ -220,10 +220,10 @@ def edit_doctor():
                 schedule = doctor["schedule"][schedule_choice - 1]
 
                 print("\nWhat do you want to edit?")
-                print("[1. Day]")
-                print("[2. Start Time]")
-                print("[3. End Time]")
-                print("[4. Availability]")
+                print("[1] Day]")
+                print("[2] Start Time]")
+                print("[3] End Time]")
+                print("[4] Availability]")
 
                 schedule_edit = get_valid_number("\nEnter choice: ", 1, 4)
 
